@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ian Alves — Portfólio</title>
+  <meta name="description" content="Portfólio pessoal de Ian — demos em JavaScript, DOM e interações." />
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg: #FFFFFF;
+      --surface: #FFFFFF;
+      --text: #1F1F1F;
+      --muted: #6B6B6B;
+      --accent: #00A7FF;
+      --accent-dark: #005F99;
+      --card-shadow: 0 6px 18px rgba(16,24,40,0.06);
+      --glass: rgba(255,255,255,0.6);
+      --error: #FF4D4D;
+      --transition: 300ms;
+    }
+
+    .dark{
+      --bg: #0D0D0D;
+      --surface: #1A1A1A;
+      --text: #F5F5F5;
+      --muted: #CFCFCF;
+      --accent: #00A7FF;
+      --accent-dark: #005F99;
+      --card-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      --glass: rgba(17,24,39,0.6);
+      --error: #FF6B6B;
+      --transition: 300ms;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;
+      background:var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      transition:background var(--transition), color var(--transition);
+      line-height:1.5;
+    }
+
+    /* NAV */
+    .nav{
+      position:fixed;left:0;right:0;top:0;display:flex;align-items:center;justify-content:space-between;padding:14px 28px;backdrop-filter: blur(6px);
+      background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.35));
+      box-shadow:0 4px 14px rgba(2,6,23,0.06);
+      transition:background var(--transition), box-shadow var(--transition), padding 180ms;
+      z-index:50;
+    }
+    .dark .nav{background: linear-gradient(180deg, rgba(10,10,10,0.6), rgba(10,10,10,0.35));}
+    .nav.shrink{padding:8px 28px;box-shadow:0 6px 30px rgba(2,6,23,0.12)}
+    .brand{display:flex;align-items:center;gap:12px;font-family:Poppins, Inter;font-weight:700}
+    .brand .mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-dark));display:flex;align-items:center;justify-content:center;color:#001;box-shadow:0 6px 18px rgba(0,167,255,0.12);font-weight:700}
+    .navlinks{display:flex;gap:18px;align-items:center}
+    .navlinks a{color:var(--text);text-decoration:none;font-weight:600;opacity:.95}
+    .navlinks a.active{color:var(--accent); text-decoration: underline; text-underline-offset: 4px; opacity: 1}
+
+    /* Toggle */
+    .toggle{background:var(--surface);border-radius:999px;padding:6px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;border:1px solid rgba(0,0,0,0.06);transition:transform 150ms}
+    .dark .toggle{border:1px solid rgba(255,255,255,0.04)}
+    .toggle .icon{width:28px;height:28px;display:grid;place-items:center}
+
+    /* Container */
+    .container{max-width:1100px;margin:0 auto;
+      /* Ajuste de padding para acomodar a nav fixa e a barra de pesquisa */
+      padding:150px 22px 80px;
+    }
+
+    /* SEARCH BAR */
+    .search-bar{
+      display:flex;
+      justify-content:center;
+      padding-bottom: 24px; 
+    }
+    .search-input-field{
+      width:100%; 
+      max-width: 500px; 
+      padding:12px;
+      border-radius:10px;
+      border:1px solid rgba(0,0,0,0.1);
+      background:var(--surface);
+      color:var(--text);
+      outline:none;
+      box-shadow:var(--card-shadow);
+      transition:border-color var(--transition);
+    }
+    .search-input-field:focus{
+      border-color:var(--accent);
+      box-shadow:0 8px 26px rgba(0,167,255,0.06);
+    }
+    .dark .search-input-field{
+      border:1px solid rgba(255,255,255,0.04);
+    }
+
+
+    /* HERO */
+    .hero{display:grid;grid-template-columns:1fr 380px;gap:32px;align-items:center}
+    .hero h1{font-family:Poppins;font-size:40px;margin:0}
+    .hero p.lead{margin:14px 0 22px;color:var(--muted);font-size:16px}
+    .cta{display:flex;gap:12px}
+    .btn{background:var(--accent);color:#001;padding:10px 16px;border-radius:10px;border:none;font-weight:700;cursor:pointer;transition:transform .12s, box-shadow .12s}
+    .btn.secondary{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--text)}
+    .dark .btn.secondary{border:1px solid rgba(255,255,255,0.06)}
+
+    .hero-avatar{background:var(--surface);border-radius:18px;padding:18px;display:flex;align-items:center;justify-content:center;box-shadow:var(--card-shadow)}
+    .avatar{width:260px;height:260px;border-radius:14px;display:grid;place-items:center;font-family:Poppins;font-size:28px;color:var(--text);background:linear-gradient(180deg,var(--glass),transparent);}
+
+    /* ABOUT */
+    .about{display:grid;grid-template-columns:1fr 360px;gap:28px;align-items:start;padding-top:40px}
+    .badge-list{display:flex;flex-direction:column;gap:12px}
+    .badge{display:flex;gap:12px;align-items:center;padding:10px;background:var(--surface);border-radius:10px;box-shadow:var(--card-shadow)}
+    .badge .dot{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-dark));display:grid;place-items:center;color:#001;font-weight:700}
+
+    /* PROJECTS */
+    .projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;padding-top:26px}
+    .card{background:var(--surface);padding:18px;border-radius:12px;border:1px solid rgba(0,0,0,0.03);box-shadow:var(--card-shadow);transition:transform var(--transition), box-shadow var(--transition), border-color var(--transition)}
+    .card:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:0 18px 40px rgba(0,167,255,0.08)}
+    .card h3{margin:0 0 8px 0;font-size:18px}
+    .card p{margin:0;color:var(--muted);font-size:14px}
+    .card .actions{display:flex;gap:8px;margin-top:12px}
+    /* CORREÇÃO AQUI: Garante que os botões (links) dentro do card herdem a cor do texto do tema */
+    .linkbtn{
+      background:transparent;
+      border:1px solid rgba(0,0,0,0.06);
+      padding:8px 10px;
+      border-radius:8px;
+      cursor:pointer;
+      color: var(--text); /* Adicionado: Garante cor no light/dark mode */
+      font-weight: 600; /* Estética do botão de demo */
+    }
+    .dark .linkbtn{
+      border:1px solid rgba(255,255,255,0.06);
+      color: var(--text); /* Reforçado para o dark mode */
+    }
+
+    /* DEMO BOX */
+    .demo{margin-top:12px;padding:10px;border-radius:8px;background:linear-gradient(180deg,rgba(0,0,0,0.02),transparent);font-family:monospace;font-size:13px;color:var(--muted)}
+    .dark .demo{background:rgba(255,255,255,0.02)}
+
+    /* CONTACT */
+    .contact{padding-top:36px}
+    form{display:flex;flex-direction:column;gap:12px;max-width:620px; margin: 0 auto;} /* Centraliza o formulário */
+    input,textarea{padding:12px;border-radius:10px;border:1px solid rgba(0,0,0,0.06);background:transparent;color:var(--text);outline:none}
+    input:focus,textarea:focus{box-shadow:0 8px 26px rgba(0,167,255,0.06);border-color:var(--accent)}
+    .dark input,.dark textarea{border:1px solid rgba(255,255,255,0.04)}
+    .error{border-color:var(--error)} /* Cor de borda de erro */
+    .icon-contato{transition: 300ms;}
+    .contato-item:hover .icon-contato{transform: translateY(-2px);}
+    .dark .contato-item svg path:not([fill="#0A66C2"]):not([fill="#D44638"]){fill:#F5F5F5;}
+
+    /* Footer */
+    footer{padding:32px 22px;text-align:center;color:var(--muted);border-top:1px solid rgba(0,0,0,0.04)}
+    .dark footer{border-top:1px solid rgba(255,255,255,0.03)}
+
+    /* Modal */
+    .modal{position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,0.45);opacity:0;pointer-events:none;transition:opacity 180ms;z-index:100}
+    .modal.show{opacity:1;pointer-events:auto}
+    .modal .panel{background:var(--surface);padding:18px;border-radius:12px;max-width:720px;width:94%;box-shadow:var(--card-shadow)}
+
+    /* Responsive */
+    @media (max-width:880px){
+      .hero{grid-template-columns:1fr;}
+      .hero-avatar{order:-1;margin-bottom:10px}
+      .about{grid-template-columns:1fr}
+    }
+
+    /* small utilities */
+    .muted{color:var(--muted)}
+    .hidden{display:none}
+
+  </style>
+</head>
+<body>
+  <nav class="nav" id="nav">
+    <div class="brand"><div class="mark">IA</div><div>Ian Alves</div></div>
+    <div class="navlinks">
+      <a href="#home">Home</a>
+      <a href="#about">Sobre</a>
+      <a href="#aba-projetos">Projetos</a>
+      <a href="#contact">Contato</a>
+      <div class="toggle" id="themeToggle" title="Alternar tema">
+        <div class="icon" id="themeIcon">🌙</div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    
+    <div class="search-bar">
+      <input type="search" id="searchBar" placeholder="Pesquisar projetos..." class="search-input-field">
+    </div>
+
+    <section id="home" class="hero">
+      <div>
+        <h1>Olá — eu sou o <span style="color:var(--accent)">Ian</span>.</h1>
+        <p class="lead">Estudante de Engenharia de Software. Construo interfaces, pequenas ferramentas e demonstrações usando <strong>JavaScript</strong> e manipulação do <strong>DOM</strong>.</p>
+
+        <div class="cta">
+          <button class="btn" id="toProjects">Ver Projetos</button>
+          <button class="btn secondary" id="toContact">Contato</button>
+        </div>
+
+        <p style="margin-top:18px" class="muted">Demonstrações: <span id="dynamicTxt">Web Interactions</span></p>
+      </div>
+
+      <aside class="hero-avatar">
+        <div class="avatar">Ian<br><small class="muted">Brasília • 18</small></div>
+      </aside>
+    </section>
+
+    <section id="about" class="about">
+      <div>
+        <h2>Sobre Mim</h2>
+        <p class="muted">Estudante apaixonado por programação web. Gosto de construir coisas pequenas e elegantes — utilitários, mini-jogos e componentes com interações claras.</p>
+        <p class="muted">Aqui estão algumas das minhas áreas de foco:</p>
+      </div>
+
+      <div class="badge-list" id="skillsList">
+        <div class="badge"><div class="dot">JS</div><div><strong>JavaScript</strong><div class="muted">Arrow functions, events, DOM</div></div></div>
+        <div class="badge"><div class="dot">💻</div><div><strong>Engenharia</strong><div class="muted">Algoritmos e Lógica</div></div></div>
+        <div class="badge"><div class="dot">📁</div><div><strong>Projetos</strong><div class="muted">Portfólio e demos</div></div></div>
+      </div>
+    </section>
+
+    <section id="aba-projetos" style="padding-top:24px">
+      <h2>Meus Projetos</h2>
+      <div class="projects-grid" id="projectsGrid">
+
+        <div class="card" data-keywords="contador eventos dom js">
+          <h3>Contador (demo)</h3>
+          <p class="muted">Pequeno contador controlado por DOM — demonstra uso de arrow functions e eventos.</p>
+          <div class="demo" id="counterDemo">
+            <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
+              <div style="font-weight:700">Contador: <span id="counterValue">0</span></div>
+              <div>
+                <button class="linkbtn" id="decBtn">-</button>
+                <button class="linkbtn" id="incBtn">+</button>
+                <button class="linkbtn" id="resetBtn">Reset</button>
+              </div>
+            </div>
+          </div>
+          <div class="actions"><button class="linkbtn" data-modal="modal1">Ver mais</button></div>
+        </div>
+
+        <div class="card" data-keywords="cor dom eventos manipulação">
+          <h3>Mudar cor do fundo</h3>
+          <p class="muted">Clique em cores para ver manipulação do DOM e eventos.</p>
+          <div class="demo" id="colorDemo">
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="linkbtn colorPick" data-color="#00A7FF">Blue</button>
+              <button class="linkbtn colorPick" data-color="#FFB86B">Orange</button>
+              <button class="linkbtn colorPick" data-color="#7AE582">Green</button>
+            </div>
+          </div>
+          <div class="actions"><button class="linkbtn" data-modal="modal2">Ver mais</button></div>
+        </div>
+
+        <div class="card" data-keywords="formulario validação ux ui">
+          <h3>Form & Validação</h3>
+          <p class="muted">Exemplo de validação simples com feedback visual.</p>
+          
+          <div class="demo" style="display:flex;align-items:center;gap:8px;">
+            <input id="demoName" placeholder="Seu nome" style="flex-grow:1"/>
+            <button class="linkbtn" id="validateDemoBtn">Tente</button>
+          </div>
+          <small class="muted" style="display:block;margin-top:4px;">Enviar vazio para ver o erro.</small> 
+          <div class="actions"><button class="linkbtn" data-modal="modal3">Ver mais</button></div>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="contact" class="contact">
+      <h2>Entre em contato comigo</h2>
+      <div class="contato-lista" style="display:flex; gap:20px; justify-content:center; margin-top:16px;">
+
+        <a href="https://linkedin.com/in/seu-usuario" target="_blank" class="contato-item" title="LinkedIn">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="#0A66C2" xmlns="http://www.w3.org/2000/svg" class="icon-contato">
+            <path d="M19 0H5C2.24 0 0 2.24 0 5V19C0 21.76 2.24 24 5 24H19C21.76 24 24 21.76 24 19V5C24 2.24 21.76 0 19 0ZM8 19H5V9H8V19ZM6.5 7.5C5.12 7.5 4 6.38 4 5C4 3.62 5.12 2.5 6.5 2.5C7.88 2.5 9 3.62 9 5C9 6.38 7.88 7.5 6.5 7.5ZM20 19H17V13.5C17 11.57 15 11.43 15 13.5V19H12V9H15V10.4C15.7 9.18 19 8.96 19 12.25V19Z"/>
+          </svg>
+        </a>
+
+        <a href="https://github.com/seu-usuario" target="_blank" class="contato-item" title="GitHub">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="#1F1F1F" xmlns="http://www.w3.org/2000/svg" class="icon-contato">
+            <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.1 3.29 9.42 7.86 10.95.58.1.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.69-3.88-1.54-3.88-1.54-.53-1.33-1.3-1.68-1.3-1.68-1.07-.73.08-.72.08-.72 1.18.08 1.8 1.22 1.8 1.22 1.05 1.8 2.75 1.28 3.42.98.1-.76.41-1.28.74-1.57-2.55-.29-5.23-1.28-5.23-5.72 0-1.26.45-2.3 1.2-3.11-.12-.3-.52-1.52.11-3.17 0 0 .97-.31 3.18 1.19.92-.26 1.9-.39 2.88-.39.98 0 1.96.13 2.88.39 2.2-1.5 3.17-1.19 3.17-1.19.63 1.65.23 2.87.11 3.17.75.81 1.85 1.19 3.11 0 4.45-2.69 5.43-5.25 5.71.42.36.79 1.08.79 2.18 0 1.57-.02 2.84-.02 3.22 0 .31.21.67.8.56C20.22 21.41 23.5 17.09 23.5 12c0-6.35-5.15-11.5-11.5-11.5Z"/>
+          </svg>
+        </a>
+
+        <a href="mailto:seuemail@example.com" class="contato-item" title="Email">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="#D44638" xmlns="http://www.w3.org/2000/svg" class="icon-contato">
+            <path d="M12 13.065L.75 6V18C.75 19.241 1.759 20.25 3 20.25H21C22.241 20.25 23.25 19.241 23.25 18V6L12 12.75L23.25 6C23.25 4.759 22.241 3.75 21 3.75Z"/>
+          </svg>
+        </a>
+
+      </div>
+
+      <form id="contactForm">
+        <input type="text" id="name" placeholder="Seu nome" />
+        <input type="email" id="email" placeholder="Seu e-mail" />
+        <textarea id="message" placeholder="Sua mensagem"></textarea>
+        
+        <p id="formMsg" class="muted" style="margin:0; text-align:center;"></p>
+        
+        <button type="submit" class="btn" style="max-width:200px; margin:0 auto;">Enviar Mensagem</button>
+      </form>
+    </section>
+
+  </main>
+
+  <footer>
+    © 2025 Ian Alves — Desenvolvedor em formação
+  </footer>
+
+  <div class="modal" id="modal1" aria-hidden>
+    <div class="panel"><h3>Contador — detalhes</h3><p class="muted">Este contador demonstra handlers com arrow functions, prevenção do comportamento padrão e atualização do DOM.</p><pre class="muted" style="white-space:pre-wrap">// Exemplo simples
+const inc = () => { value++; el.textContent = value }</pre><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px"><button class="linkbtn" data-close>Fechar</button></div></div>
+  </div>
+  <div class="modal" id="modal2" aria-hidden>
+    <div class="panel"><h3>Mudar cor — detalhes</h3><p class="muted">Cada botão aplica uma cor ao <code>document.body</code> demonstrando manipulação do DOM.</p><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px"><button class="linkbtn" data-close>Fechar</button></div></div>
+  </div>
+  <div class="modal" id="modal3" aria-hidden>
+    <div class="panel"><h3>Validação — detalhes</h3><p class="muted">O formulário abaixo valida nome e email, mostrando erros em tempo real.</p><form id="miniForm"><input id="miniName" placeholder="Nome (obrigatório)"/><input id="miniEmail" placeholder="Email (obrigatório)"/><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px"><button type="submit" class="linkbtn">Enviar</button><button type="button" class="linkbtn" data-close>Fechar</button></div></form></div>
+  </div>
+
+  <script>
+    // ===== Utilities & initial state =====
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+    // Theme management (dark toggle with localStorage)
+    const themeToggle = $('#themeToggle');
+    const themeIcon = $('#themeIcon');
+    const root = document.documentElement;
+
+    const setTheme = isDark => {
+      document.body.classList.toggle('dark', isDark);
+      themeIcon.textContent = isDark ? '☀️' : '🌙';
+      localStorage.setItem('darkMode', isDark ? '1' : '0');
+    };
+
+    // initialize theme
+    (() => {
+      const saved = localStorage.getItem('darkMode');
+      if(saved === null){
+        // prefer system
+        const prefers = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setTheme(prefers);
+      } else setTheme(saved === '1');
+    })();
+
+    themeToggle.addEventListener('click', () => {
+      const isDark = !document.body.classList.contains('dark');
+      setTheme(isDark);
+      themeToggle.animate([{transform:'rotate(0)'},{transform:'rotate(360deg)'}],{duration:420});
+    });
+
+    // Smooth scrolling from navbar buttons
+    $$('#nav a').forEach(a => a.addEventListener('click', e => {
+      e.preventDefault();
+      const id = a.getAttribute('href');
+      document.querySelector(id).scrollIntoView({behavior:'smooth', block:'start'});
+    }));
+
+    // Navbar shrink on scroll
+    const nav = $('#nav');
+    window.addEventListener('scroll', () => {
+      if(window.scrollY > 20) nav.classList.add('shrink'); else nav.classList.remove('shrink');
+    });
+
+    // Hero cta scroll
+    $('#toProjects').addEventListener('click', () => document.querySelector('#aba-projetos').scrollIntoView({behavior:'smooth'}));
+    $('#toContact').addEventListener('click', () => document.querySelector('#contact').scrollIntoView({behavior:'smooth'}));
+
+    // ===== Dynamic typing / rotating text (simple) =====
+    const phrases = ['Web Interactions', 'Arrow Functions', 'Eventos & DOM', 'Interfaces simples'];
+    let pi = 0; let ch = 0; let forward = true; const dtEl = $('#dynamicTxt');
+    const tick = () => {
+      const str = phrases[pi];
+      dtEl.textContent = str.slice(0, ch) + (ch < str.length && forward ? '|' : ''); 
+      if(forward){ 
+        ch++; 
+        if(ch > str.length){ 
+          forward=false; 
+          setTimeout(tick,900);
+          return 
+        } 
+      } else { 
+        ch--; 
+        if(ch < 0){ 
+          forward=true; 
+          pi = (pi+1)%phrases.length 
+        }
+      }
+      setTimeout(tick, forward ? 90 : 40);
+    };
+    tick();
+
+    // ===== Search: filtrar projetos (busca em título e data-keywords) =====
+    const searchBar = $('#searchBar');
+    if(searchBar){
+      searchBar.addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase().trim();
+        $$('#projectsGrid .card').forEach(card => {
+          const title = (card.querySelector('h3') && card.querySelector('h3').textContent || '').toLowerCase();
+          const keywords = (card.dataset.keywords || '').toLowerCase(); 
+          
+          const visible = title.includes(q) || keywords.includes(q); 
+          card.style.display = visible ? '' : 'none';
+        });
+      });
+    }
+
+    // ===== Projects: Counter demo =====
+    let cnt = 0;
+    const counterValue = $('#counterValue');
+    const incBtn = $('#incBtn');
+    const decBtn = $('#decBtn');
+    const resetBtn = $('#resetBtn');
+
+    const renderCounter = () => counterValue.textContent = cnt;
+    const inc = () => { cnt++; renderCounter(); };
+    const dec = () => { cnt--; renderCounter(); };
+    const reset = () => { cnt = 0; renderCounter(); };
+
+    incBtn.addEventListener('click', () => inc());
+    decBtn.addEventListener('click', () => dec());
+    resetBtn.addEventListener('click', () => reset());
+
+    // ===== Color demo: change body background (demonstration) =====
+    $$('.colorPick').forEach(btn => btn.addEventListener('click', e => {
+      const c = e.currentTarget.dataset.color;
+      document.body.style.transition = 'background-color 420ms';
+      document.body.style.background = c;
+      
+      setTimeout(()=>{ 
+        document.body.style.transition = '';
+        setTimeout(()=>{ document.body.style.background = ''; }, 900); 
+      }, 10);
+    }));
+
+    // ===== Modal mini form (com validação e alert) =====
+    $('#miniForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const n = $('#miniName'); const em = $('#miniEmail');
+      [n, em].forEach(x=>x.classList.remove('error'));
+      let ok = true;
+      if(!n.value.trim()){ n.classList.add('error'); ok=false }
+      if(!em.value.trim() || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em.value)){ em.classList.add('error'); ok=false }
+      
+      if(!ok) return;
+      
+      alert('Formulário Enviado com sucesso!');
+      n.value = ''; em.value = ''; 
+      document.getElementById('modal3').classList.remove('show');
+    });
+
+    // ===== Contact Form Validation and Submission Logic (CÓDIGO QUE FALTAVA) =====
+    const contactForm = $('#contactForm');
+    const name = $('#name');
+    const email = $('#email');
+    const message = $('#message');
+    const formMsg = $('#formMsg');
+
+    if(contactForm) {
+      contactForm.addEventListener('submit', e => {
+        e.preventDefault();
+        let ok = true;
+        
+        [name, email, message].forEach(el => el.classList.remove('error'));
+        
+        // Validação
+        if(!name.value.trim()){ name.classList.add('error'); ok=false }
+        if(!email.value.trim() || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value)){ email.classList.add('error'); ok=false }
+        if(!message.value.trim()){ message.classList.add('error'); ok=false }
+        
+        // Feedback de erro
+        if(!ok){ 
+          formMsg.style.color = 'var(--error)';
+          formMsg.textContent = 'Preencha todos os campos corretamente.'; 
+          return 
+        }
+        
+        // Feedback de envio
+        formMsg.style.color = 'var(--accent)';
+        formMsg.textContent = 'Enviando...';
+        
+        // Simulação de sucesso após 800ms
+        setTimeout(()=>{ 
+          formMsg.textContent = 'Mensagem enviada! Obrigado 😊'; 
+          contactForm.reset(); 
+          setTimeout(() => { formMsg.textContent = ''; }, 4000);
+        }, 800);
+      });
+    }
+
+    // ===== Demo de Validação Rápida no Card 3 (CÓDIGO CORRIGIDO) =====
+    const demoNameInput = $('#demoName');
+    const validateDemoBtn = $('#validateDemoBtn');
+
+    if (demoNameInput && validateDemoBtn) {
+        validateDemoBtn.addEventListener('click', () => {
+            demoNameInput.classList.remove('error');
+            if (!demoNameInput.value.trim()) {
+                demoNameInput.classList.add('error');
+            } else {
+                alert('Campo preenchido! Limpando o campo.');
+                demoNameInput.value = '';
+            }
+        });
+    }
+
+    // ===== Mini modal system =====
+    const modals = Array.from($$('.modal'));
+    const openModal = id => {
+      const m = $(`#${id}`);
+      if(!m) return;
+      m.classList.add('show');
+      m.querySelector('.panel').focus(); 
+    };
+    const closeModal = el => {
+      const modal = el.closest('.modal');
+      if(modal) modal.classList.remove('show');
+    };
+
+    $$('[data-modal]').forEach(b => b.addEventListener('click', e => openModal(e.currentTarget.dataset.modal)));
+    $$('[data-close]').forEach(b => b.addEventListener('click', e => closeModal(e.currentTarget)));
+    modals.forEach(m => m.addEventListener('click', e => { if(e.target === m) m.classList.remove('show'); }));
+
+    // ===== IntersectionObserver for about badges animation =====
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting){
+          entry.target.style.transition = 'transform 420ms, opacity 420ms';
+          entry.target.style.transform = 'translateY(0)';
+          entry.target.style.opacity = '1';
+          observer.unobserve(entry.target);
+        }
+      });
+    },{threshold:0.15});
+
+    $$('.badge').forEach(b=>{ b.style.transform='translateY(10px)'; b.style.opacity='0'; observer.observe(b) });
+
+    // ===== small accessibility: close modals with Esc and ensure nav links active state on scroll =====
+    document.addEventListener('keydown', e => { if(e.key === 'Escape') modals.forEach(m => m.classList.remove('show')) });
+
+    const sections = ['home','about','aba-projetos','contact'].map(id=>document.getElementById(id));
+    const linkMap = sections.reduce((acc,s)=>{ acc[s.id]=$$(`#nav a[href=\#${s.id}]`)[0]; return acc },{});
+    const onScroll = () => {
+      let current = sections[0].id;
+      sections.forEach(s => {
+        if (window.scrollY >= s.offsetTop - nav.offsetHeight - 50) {
+          current = s.id;
+        }
+      });
+
+      Object.values(linkMap).forEach(a=>a.classList.remove('active'));
+      if(linkMap[current]) linkMap[current].classList.add('active');
+    };
+    window.addEventListener('scroll', onScroll);
+    onScroll(); 
+  </script>
+</body>
+</html>
